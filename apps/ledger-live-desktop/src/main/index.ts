@@ -72,7 +72,7 @@ app.on("will-finish-launching", () => {
 app.on("ready", async () => {
   app.dirname = __dirname;
   if (__DEV__) {
-    await installExtensions();
+    // await installExtensions();
   }
   db.init(userDataDirectory);
   const settings: SettingsState = await db.getKey("app", "settings");
