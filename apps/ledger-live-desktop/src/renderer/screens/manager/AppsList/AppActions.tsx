@@ -2,11 +2,7 @@ import React, { useCallback, useMemo, memo } from "react";
 import { useAppInstallNeedsDeps, useAppUninstallNeedsDeps } from "@ledgerhq/live-common/apps/react";
 import manager from "@ledgerhq/live-common/manager/index";
 import { useHistory } from "react-router-dom";
-<<<<<<< HEAD
 import { AppType } from "@ledgerhq/types-live";
-=======
-import { App, FeatureId } from "@ledgerhq/types-live";
->>>>>>> ad11c3010b (lld add account feature flag)
 import { State, Action, InstalledItem } from "@ledgerhq/live-common/apps/types";
 import styled from "styled-components";
 import { Trans } from "react-i18next";
