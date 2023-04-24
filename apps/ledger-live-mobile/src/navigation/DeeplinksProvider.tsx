@@ -379,6 +379,7 @@ const getOnboardingLinkingOptions = (acceptedTermsOfUse: boolean) => ({
                */
               [ScreenName.PlatformApp]: "discover/:platform",
               [ScreenName.Recover]: "recover/:platform",
+              [ScreenName.RecoverBypassOnboarding]: "recover-bypass-onboarding",
             },
           },
         },

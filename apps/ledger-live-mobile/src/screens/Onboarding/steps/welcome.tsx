@@ -122,6 +122,27 @@ function OnboardingStepWelcome({ navigation }: NavigationProps) {
     ? videoSources.welcomeScreenStax
     : videoSources.welcomeScreen;
 
+  const recoverFeature = useFeature("protectServicesMobile");
+
+  const recoverLogIn = useCallback(() => {
+    if (!recoverFeature?.enabled) return;
+
+    acceptTerms();
+    dispatch(setAnalytics(true));
+
+    const bypassLLOnboardingURL = "ledgerlive://recover-bypass-onboarding";
+    const url = `${recoverFeature?.params?.account?.loginURI}&bypassLLOnboardingURL=${bypassLLOnboardingURL}`;
+
+    Linking.canOpenURL(url).then(canOpen => {
+      if (canOpen) Linking.openURL(url);
+    });
+  }, [
+    acceptTerms,
+    dispatch,
+    recoverFeature?.enabled,
+    recoverFeature?.params?.account?.loginURI,
+  ]);
+
   return (
     <ForceTheme selectedPalette={"dark"}>
       <Flex flex={1} position="relative" bg="constant.purple">
@@ -221,6 +242,16 @@ function OnboardingStepWelcome({ navigation }: NavigationProps) {
             mb={7}
           >
             {t("onboarding.stepWelcome.start")}
+          </Button>
+          <Button
+            outline
+            type="main"
+            size="large"
+            onPress={recoverLogIn}
+            mt={0}
+            mb={7}
+          >
+            {t("onboarding.stepWelcome.recoverLogIn")}
           </Button>
           <Text variant="small" textAlign="center" color="neutral.c100">
             {t("onboarding.stepWelcome.terms")}

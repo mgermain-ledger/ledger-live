@@ -88,6 +88,7 @@ import {
   NavigationHeaderCloseButton,
   NavigationHeaderCloseButtonAdvanced,
 } from "../NavigationHeaderCloseButton";
+import BypassOnboardingScreen from "../../screens/Protect/BypassOnboarding";
 
 const Stack = createStackNavigator<BaseNavigatorStackParamList>();
 
@@ -563,6 +564,11 @@ export default function BaseNavigator() {
         name={ScreenName.RedirectToOnboardingRecoverFlow}
         options={{ headerShown: false }}
         component={RedirectToOnboardingRecoverFlowScreen}
+      />
+      <Stack.Screen
+        name={ScreenName.RecoverBypassOnboarding}
+        component={BypassOnboardingScreen}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name={NavigatorName.NoFundsFlow}
