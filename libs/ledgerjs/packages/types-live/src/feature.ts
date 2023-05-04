@@ -29,6 +29,7 @@ export type FeatureId =
   | "currencyVelasEvm"
   | "currencySyscoin"
   | "currencyAxelar"
+  | "currencyNyx"
   | "currencyOnomy"
   | "currencyPersistence"
   | "currencyQuicksilver"

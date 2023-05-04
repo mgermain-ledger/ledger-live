@@ -71,6 +71,9 @@ export const defaultFeatures: DefaultFeatures = {
   currencyAxelar: {
     enabled: false,
   },
+  currencyNyx: {
+    enabled: false,
+  },
   currencyOnomy: {
     enabled: false,
   },
