@@ -10,9 +10,9 @@ import { openURL } from "~/renderer/linking";
 import { withV3StyleProvider } from "~/renderer/styles/StyleProviderV3";
 import Button from "~/renderer/components/ButtonV3";
 import CheckBox from "~/renderer/components/CheckBox";
-import perFamilyManageActions from "~/renderer/generated/AccountHeaderManageActions";
 import { getAccountName } from "@ledgerhq/live-common/account/index";
 import { Account } from "@ledgerhq/types-live";
+import { getLLDCoinFamily } from "~/renderer/families";
 
 export const LOCAL_STORAGE_KEY_PREFIX = "receive_staking_";
 
@@ -42,17 +42,18 @@ const StepReceiveStakingFlow = (props: StepProps) => {
 
   const id = account && "currency" in account ? account.currency?.id : undefined;
   const supportLink = id ? receiveStakingFlowConfig?.params[id]?.supportLink : undefined;
+
   const manage =
-    account && "currency" in account
-      ? perFamilyManageActions[account.currency.family as keyof typeof perFamilyManageActions]
-      : undefined;
+    account && account.type === "Account"
+      ? getLLDCoinFamily(account.currency.family).accountHeaderManageActions
+      : null;
+
   const familyManageActions =
     account && manage ? manage({ account: account as Account, parentAccount }) : undefined;
 
   useEffect(() => {
     const manageList =
       familyManageActions && familyManageActions.length > 0 ? familyManageActions : [];
-    // @ts-expect-error ts seems to have issues with union of arrays of different types
     const newAction = manageList && manageList.find(item => item.key === "Stake");
     const newTitle = t(`receive.steps.staking.${id}.title`);
     const newDescription = t(`receive.steps.staking.${id}.description`);
@@ -119,22 +120,19 @@ const StepReceiveStakingFlow = (props: StepProps) => {
   );
 };
 
-type Manage = ReturnType<typeof perFamilyManageActions[keyof typeof perFamilyManageActions]>;
 export const StepReceiveStakingFooter = (props: StepProps) => {
   const { t } = useTranslation();
-  const [action, setAction] = useState<Manage>({} as Manage);
+  const [action, setAction] = useState<any>({});
   const { account, parentAccount, closeModal } = props;
-  const manage =
-    account &&
-    "currency" in account &&
-    perFamilyManageActions[account.currency.family as keyof typeof perFamilyManageActions];
+  const specific =
+    account && account.type === "Account" ? getLLDCoinFamily(account.currency.family) : null;
+  const manage = specific?.accountHeaderManageActions;
   const familyManageActions =
     manage && account && manage({ account: account as Account, parentAccount });
 
   useEffect(() => {
     const manageList =
       familyManageActions && familyManageActions.length > 0 ? familyManageActions : [];
-    // @ts-expect-error ts seems to have issues with union of arrays of different types
     const newAction = manageList && manageList.find(item => item.key === "Stake");
     if (JSON.stringify(newAction) !== JSON.stringify(action)) {
       setAction(newAction);
@@ -150,13 +148,11 @@ export const StepReceiveStakingFooter = (props: StepProps) => {
           .join("/"),
         flow: "stake",
         currency: account && "currency" in account ? account?.currency?.name : undefined,
-        // @ts-expect-error this is a valid check
         provider: (action && "provider" in action && action?.provider?.name) || "Ledger",
         modal: "receive",
         account: account && getAccountName(account),
       };
     },
-    // @ts-expect-error this is a valid check
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [account, action?.provider?.name],
   );
@@ -188,7 +184,6 @@ export const StepReceiveStakingFooter = (props: StepProps) => {
       <Button onClick={onCloseModal}>{t("receive.steps.staking.footer.dismiss")}</Button>
       <Button variant="color" onClick={onStake}>
         {t("receive.steps.staking.footer.stake", {
-          // @ts-expect-error this is a valid check
           provider: action?.provider?.name ? action?.provider?.name : "Ledger",
         })}
       </Button>
