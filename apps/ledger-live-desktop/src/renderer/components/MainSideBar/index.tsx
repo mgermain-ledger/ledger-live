@@ -296,6 +296,10 @@ const MainSideBar = () => {
     push("/earn");
     trackEntry("earn");
   }, [push, trackEntry]);
+  const handleClickWhisp = useCallback(() => {
+    push("/whisp");
+    trackEntry("whisp");
+  }, [push, trackEntry]);
   const handleClickSwap = useCallback(() => {
     push("/swap");
     trackEntry("swap");
@@ -421,6 +425,14 @@ const MainSideBar = () => {
                   disabled={noAccounts || navigationLocked}
                   collapsed={secondAnim}
                 />
+                <SideBarListItem
+                  id={"whisp"}
+                  label={t("Whisp")}
+                  icon={IconReceive}
+                  iconActiveColor="wallet"
+                  onClick={handleClickWhisp}
+                  collapsed={secondAnim}
+                />
                 <FeatureToggle feature="ptxEarn">
                   <SideBarListItem
                     id={"earn"}
@@ -464,7 +476,7 @@ const MainSideBar = () => {
                     NotifComponent={
                       referralProgramConfig?.params.isNew ? (
                         <CustomTag active type="plain" size="small">
-                          {t("common.new")}
+                          {t("Beta")}
                         </CustomTag>
                       ) : null
                     }

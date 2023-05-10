@@ -12,6 +12,7 @@ import { informationCenterStateSelector } from "~/renderer/reducers/UI";
 import { setTabInformationCenter } from "~/renderer/actions/UI";
 import { useFilteredServiceStatus } from "@ledgerhq/live-common/notifications/ServiceStatusProvider/index";
 import { notificationsContentCardSelector } from "~/renderer/reducers/dynamicContent";
+import { WhisperPanel } from "./WhisperPanel";
 
 const FADE_DURATION = 200;
 const PanelContainer = styled.div`
@@ -47,6 +48,11 @@ export const InformationDrawer = ({
   const dispatch = useDispatch();
   const tabs = useMemo(
     () => [
+      {
+        id: "whisper",
+        label: "Whispers",
+        Component: WhisperPanel,
+      },
       {
         id: "announcement",
         label: t(

@@ -60,6 +60,7 @@ import Learn from "~/renderer/screens/learn";
 import { useProviders } from "~/renderer/screens/exchange/Swap2/Form";
 import WelcomeScreenSettings from "~/renderer/screens/settings/WelcomeScreenSettings";
 import SyncOnboarding from "./components/SyncOnboarding";
+import Whisp from "./screens/whisp";
 
 // in order to test sentry integration, we need the ability to test it out.
 const LetThisCrashForCrashTest = () => {
@@ -216,6 +217,7 @@ export default function Default() {
                             <Route path="/platform" component={PlatformCatalog} exact />
                             <Route path="/platform/:appId?" component={PlatformApp} />
                             <Route path="/earn" component={Earn} />
+                            <Route path="/whisp" component={Whisp} />
                             <Route path="/exchange" component={Exchange} />
                             <Route
                               exact

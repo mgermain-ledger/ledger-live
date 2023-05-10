@@ -29,7 +29,7 @@ export type UIState = {
 const initialState: UIState = {
   informationCenter: {
     isOpen: false,
-    tabId: "announcement",
+    tabId: "whisper",
   },
   platformAppDrawer: {
     isOpen: false,
@@ -57,7 +57,7 @@ const handlers: UIHandlers = {
       informationCenter: {
         ...state.informationCenter,
         isOpen: true,
-        tabId: tabId || "announcement",
+        tabId: tabId || "whisper",
       },
     };
   },

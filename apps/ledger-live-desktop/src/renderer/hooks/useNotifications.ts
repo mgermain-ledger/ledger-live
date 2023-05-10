@@ -15,7 +15,7 @@ export function useNotifications() {
   const [cachedNotifications, setCachedNotifications] = useState<braze.Card[]>([]);
   const dispatch = useDispatch();
   const notificationsCards = useSelector(notificationsContentCardSelector);
-
+  
   useEffect(() => {
     const cards = braze
       .getCachedContentCards()
@@ -88,6 +88,8 @@ export function useNotifications() {
     (card: ContentCard) => {
       const currentCard = cachedNotifications.find(c => c.id === card.id);
 
+      // Add here the fact that we need to trigger the CTA to sign the transaction
+      
       if (currentCard) {
         braze.logContentCardClick(currentCard);
       }
