@@ -5,10 +5,13 @@ import { useHistory, useLocation } from "react-router-dom";
 import { openModal } from "~/renderer/actions/modals";
 import IconPlus from "~/renderer/icons/Plus";
 import Button from "~/renderer/components/Button";
-import { Flex, Text } from "@ledgerhq/react-ui";
+import { Flex, Text, Tag as TagComponent } from "@ledgerhq/react-ui";
 import styled from "styled-components";
 import CatalogBanner from "../platform/CatalogBanner";
 import { WhispersTable } from "./Table";
+import LiveAppIcon from "~/renderer/components/WebPlatformPlayer/LiveAppIcon";
+import IconCheck from "~/renderer/icons/Check";
+import { colors } from "~/renderer/styles/theme";
 
 interface Alert {
   id: number;
@@ -87,9 +90,14 @@ const CardHeaderContainer = styled(Box)`
 `;
 const CardHeader = styled(Text)`
   font-weight: 600;
-  font-size: 12px;
-  margin-left: 8px;
+  font-size: 16px;
 `;
+
+const CardSubtitle = styled(Text)`
+  font-weight: 00;
+  font-size: 12px;
+`;
+
 const CustomButton = styled(Button)`
   border: none;
   padding-right: 14px;
@@ -125,6 +133,20 @@ const AlertCard = styled.div`
   padding: 20px;
   border-radius: 4px;
   background-color: ${p => p.theme.colors.palette.opacityDefault.c05};
+`;
+
+const AlertRow = styled.div`
+  padding: 20px;
+  border-radius: 4px;
+  flex-direction: row;
+  display: flex;
+  justify-content: space-between;
+  background-color: ${p => p.theme.colors.palette.opacityDefault.c05};
+`;
+
+const CustomTag = styled(TagComponent)`
+  border-radius: 6px;
+  padding: 2px 6px 2px 6px;
 `;
 
 const Whisp = () => {
@@ -196,25 +218,35 @@ const Whisp = () => {
           </Box>
         </Flex>
       </Box>
+
       <Box>
         {/* Beth stuff */}
         {!!dummyWhisperSubs && <WhispersTable data={dummyWhisperSubs} />}
       </Box>
 
-      {/* Other stuff */}
-      <AlertsGrid>
-        {dummyWhisperSubs.map(alert => (
-          <AlertCard key={alert.id}>
-            <CardHeaderContainer>
-              <CardHeader>{alert.name}</CardHeader>
-            </CardHeaderContainer>
-            <CardContent>
-              <p>{alert.address}</p>
-              <p>{alert.condition}</p>
-            </CardContent>
-          </AlertCard>
-        ))}
-      </AlertsGrid>
+      <Box>
+        <Box id="header" horizontal marginBottom="18px">
+          <Box horizontal grow justifyContent="space-between">
+            <Box>
+              <Title>Discover</Title>
+            </Box>
+          </Box>
+        </Box>
+        <AlertsGrid>
+          {dummyWhisperSubs.map(alert => (
+            <AlertCard key={alert.id}>
+              <CardHeaderContainer>
+                <CardHeader>{alert.name}</CardHeader>
+              </CardHeaderContainer>
+              <CardContent>
+                <p>{alert.address}</p>
+                <p>{alert.condition}</p>
+              </CardContent>
+            </AlertCard>
+          ))}
+        </AlertsGrid>
+      </Box>
+
       <Box>
         <NotificationPanel></NotificationPanel>
       </Box>
