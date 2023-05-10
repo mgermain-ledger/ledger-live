@@ -64,6 +64,7 @@
     "@sentry/electron": "^4.3.0",
     "@sentry/node": "7.37.1",
     "@sentry/tracing": "7.37.1",
+    "@tanstack/react-table": "^8.9.1",
     "@tippyjs/react": "^4.2.6",
     "@trust/keyto": "^1.0.1",
     "@types/qrcode": "^1.5.0",

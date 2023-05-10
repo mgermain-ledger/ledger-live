@@ -1,16 +1,14 @@
-import Box, { Card } from "~/renderer/components/Box";
-import React, { useState, useEffect, useCallback } from "react";
+import Box from "~/renderer/components/Box";
+import React, { useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { Link, useHistory, useLocation } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { openModal } from "~/renderer/actions/modals";
 import IconPlus from "~/renderer/icons/Plus";
 import Button from "~/renderer/components/Button";
-import { focusedShadowStyle } from "~/renderer/components/Box/Tabbable";
-import { Tag, Text } from "@ledgerhq/react-ui";
+import { Flex, Text } from "@ledgerhq/react-ui";
 import styled from "styled-components";
 import CatalogBanner from "../platform/CatalogBanner";
-import ChevronRight from "~/renderer/icons/ChevronRight";
-import InfoCircle from "~/renderer/icons/InfoCircle";
+import { WhispersTable } from "./Table";
 
 interface Alert {
   id: number;
@@ -19,24 +17,42 @@ interface Alert {
   condition: string;
 }
 
-const dummyAlerts: Alert[] = [
+//  temp type until i have data
+export type WhispersSubscription = {
+  id: number;
+  name: string;
+  address: string; // "address of interest" | "contract of interest"
+  condition: string;
+  ticker?: string; // e.g. "ETH" for icon
+  action?: "transfer" | "withdrawal" | "mint" | "burn" | "send" | "receive" | string;
+  threshold?: number;
+  currencyCategory?: "native" | "erc20" | "erc721" | "erc1155";
+};
+
+const dummyWhisperSubs: WhispersSubscription[] = [
   {
     id: 1,
     name: "Mint 4 NFTs",
     address: "0x123456789",
     condition: "mint 4 NFTs of CryptoKitties collection",
+    threshold: 4,
+    action: "mint",
   },
   {
     id: 2,
     name: "Large liquidity withdrawal",
     address: "0x987654321",
-    condition: "withdrawal of more than 100000 from Uniswap pool",
+    condition: "withdrawal of more than 100,000 from Uniswap pool",
+    threshold: 100000,
+    action: "withdrawal",
   },
   {
     id: 3,
     name: "Price increase",
     address: "0xabcdef0123",
     condition: "ETH price exceeds 5000",
+    threshold: 5000,
+    action: undefined,
   },
 ];
 
@@ -115,34 +131,34 @@ const Whisp = () => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [serverAlerts, setServerAlerts] = useState<Alert[]>([]);
 
-  const ws = new WebSocket('ws://localhost:3000/ws')
+  const ws = new WebSocket("ws://localhost:3000/ws");
 
   const history = useHistory();
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const openAddAccounts = useCallback(() => {
-    dispatch(openModal("MODAL_ADD_ACCOUNTS", undefined));
+  const openAddWhisper = useCallback(() => {
+    dispatch(openModal("MODAL_ADD_WHISPER", undefined));
   }, [dispatch]);
 
-//   useEffect(() => {
-//     const ws = new WebSocket("ws://localhost:8080/ws");
-//     ws.onopen = () => {
-//       console.log("connected");
-//     };
-//     ws.onmessage = (event) => {
-//       const data = JSON.parse(event.data);
-//       console.log(data);
-//       const updatedAlerts = [...serverAlerts, data];
-//       setServerAlerts(updatedAlerts);
-//     };
-//     ws.onclose = () => {
-//       console.log("disconnected");
-//     };
-//     return () => {
-//       ws.close();
-//     };
-//   }, [serverAlerts]);
+  //   useEffect(() => {
+  //     const ws = new WebSocket("ws://localhost:8080/ws");
+  //     ws.onopen = () => {
+  //       console.log("connected");
+  //     };
+  //     ws.onmessage = (event) => {
+  //       const data = JSON.parse(event.data);
+  //       console.log(data);
+  //       const updatedAlerts = [...serverAlerts, data];
+  //       setServerAlerts(updatedAlerts);
+  //     };
+  //     ws.onclose = () => {
+  //       console.log("disconnected");
+  //     };
+  //     return () => {
+  //       ws.close();
+  //     };
+  //   }, [serverAlerts]);
   const push = useCallback(
     (pathname: string) => {
       if (location.pathname === pathname) return;
@@ -163,42 +179,46 @@ const Whisp = () => {
   }, [dispatch, maybeRedirectToAccounts]);
 
   return (
-    <>
+    <Box>
       <CatalogBanner />
-      <Box grow>
-        <Box id="header" horizontal grow marginBottom="18px">
-          <Box horizontal grow justifyContent="space-between">
-            <Box>
-              <Title>Whispers</Title>
-            </Box>
-            <Box>
-              <Button small primary onClick={handleOpenSendModal}>
-                <Box horizontal flow={1} alignItems="center">
-                  <IconPlus size={12} />
-                  <Box>New Account</Box>
-                </Box>
-              </Button>
-            </Box>
+      <Box id="header" horizontal grow mb={1}>
+        <Flex justifyContent="space-between" flexDirection={"row"} flexGrow={1}>
+          <Box>
+            <Title>Whispers</Title>
           </Box>
-        </Box>
-        <AlertsGrid>
-          {dummyAlerts.map(alert => (
-            <AlertCard key={alert.id}>
-              <CardHeaderContainer>
-                <CardHeader>{alert.name}</CardHeader>
-              </CardHeaderContainer>
-              <CardContent>
-                <p>{alert.address}</p>
-                <p>{alert.condition}</p>
-              </CardContent>
-            </AlertCard>
-          ))}
-        </AlertsGrid>
-        <Box>
-          <NotificationPanel></NotificationPanel>
-        </Box>
+          <Box>
+            <Button small primary onClick={handleOpenSendModal}>
+              <Box horizontal flow={1} alignItems="center">
+                <IconPlus size={12} />
+                <Box>Hear new whisper</Box>
+              </Box>
+            </Button>
+          </Box>
+        </Flex>
       </Box>
-    </>
+      <Box>
+        {/* Beth stuff */}
+        {!!dummyWhisperSubs && <WhispersTable data={dummyWhisperSubs} />}
+      </Box>
+
+      {/* Other stuff */}
+      <AlertsGrid>
+        {dummyWhisperSubs.map(alert => (
+          <AlertCard key={alert.id}>
+            <CardHeaderContainer>
+              <CardHeader>{alert.name}</CardHeader>
+            </CardHeaderContainer>
+            <CardContent>
+              <p>{alert.address}</p>
+              <p>{alert.condition}</p>
+            </CardContent>
+          </AlertCard>
+        ))}
+      </AlertsGrid>
+      <Box>
+        <NotificationPanel></NotificationPanel>
+      </Box>
+    </Box>
   );
 };
 
