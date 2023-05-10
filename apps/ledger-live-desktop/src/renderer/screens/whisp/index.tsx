@@ -216,11 +216,11 @@ const Whisp = () => {
                   </Box>
                 </Box>
                 <div>
-                  <CustomTag active type="plain" size="small">
+                  {/* <CustomTag active type="plain" size="small">
                     Activated
-                  </CustomTag>
+                  </CustomTag> */}
                   <Box>
-                      <IconCheck color={colors.positiveGreen} size={16} />
+                    <IconCheck color={colors.positiveGreen} size={16} />
                   </Box>
                 </div>
               </AlertRow>
