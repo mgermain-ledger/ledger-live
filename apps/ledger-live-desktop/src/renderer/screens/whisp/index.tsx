@@ -6,11 +6,15 @@ import { openModal } from "~/renderer/actions/modals";
 import IconPlus from "~/renderer/icons/Plus";
 import Button from "~/renderer/components/Button";
 import { focusedShadowStyle } from "~/renderer/components/Box/Tabbable";
-import { Tag, Text } from "@ledgerhq/react-ui";
+import { Icons, Text, Tag as TagComponent, Toggle } from "@ledgerhq/react-ui";
 import styled from "styled-components";
 import CatalogBanner from "../platform/CatalogBanner";
 import ChevronRight from "~/renderer/icons/ChevronRight";
 import InfoCircle from "~/renderer/icons/InfoCircle";
+import LiveAppIcon from "~/renderer/components/WebPlatformPlayer/LiveAppIcon";
+import IconCheck from "~/renderer/icons/Check";
+import { colors } from "~/renderer/styles/theme";
+
 
 interface Alert {
   id: number;
@@ -71,9 +75,14 @@ const CardHeaderContainer = styled(Box)`
 `;
 const CardHeader = styled(Text)`
   font-weight: 600;
-  font-size: 12px;
-  margin-left: 8px;
+  font-size: 16px;
 `;
+
+const CardSubtitle = styled(Text)`
+  font-weight: 00;
+  font-size: 12px;
+`;
+
 const CustomButton = styled(Button)`
   border: none;
   padding-right: 14px;
@@ -111,11 +120,25 @@ const AlertCard = styled.div`
   background-color: ${p => p.theme.colors.palette.opacityDefault.c05};
 `;
 
+const AlertRow = styled.div`
+  padding: 20px;
+  border-radius: 4px;
+  flex-direction: row;
+  display: flex;
+  justify-content: space-between;
+  background-color: ${p => p.theme.colors.palette.opacityDefault.c05};
+`;
+
+const CustomTag = styled(TagComponent)`
+  border-radius: 6px;
+  padding: 2px 6px 2px 6px;
+`;
+
 const Whisp = () => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [serverAlerts, setServerAlerts] = useState<Alert[]>([]);
 
-  const ws = new WebSocket('ws://localhost:3000/ws')
+  const ws = new WebSocket("ws://localhost:3000/ws");
 
   const history = useHistory();
   const location = useLocation();
@@ -125,24 +148,24 @@ const Whisp = () => {
     dispatch(openModal("MODAL_ADD_ACCOUNTS", undefined));
   }, [dispatch]);
 
-//   useEffect(() => {
-//     const ws = new WebSocket("ws://localhost:8080/ws");
-//     ws.onopen = () => {
-//       console.log("connected");
-//     };
-//     ws.onmessage = (event) => {
-//       const data = JSON.parse(event.data);
-//       console.log(data);
-//       const updatedAlerts = [...serverAlerts, data];
-//       setServerAlerts(updatedAlerts);
-//     };
-//     ws.onclose = () => {
-//       console.log("disconnected");
-//     };
-//     return () => {
-//       ws.close();
-//     };
-//   }, [serverAlerts]);
+  //   useEffect(() => {
+  //     const ws = new WebSocket("ws://localhost:8080/ws");
+  //     ws.onopen = () => {
+  //       console.log("connected");
+  //     };
+  //     ws.onmessage = (event) => {
+  //       const data = JSON.parse(event.data);
+  //       console.log(data);
+  //       const updatedAlerts = [...serverAlerts, data];
+  //       setServerAlerts(updatedAlerts);
+  //     };
+  //     ws.onclose = () => {
+  //       console.log("disconnected");
+  //     };
+  //     return () => {
+  //       ws.close();
+  //     };
+  //   }, [serverAlerts]);
   const push = useCallback(
     (pathname: string) => {
       if (location.pathname === pathname) return;
@@ -166,7 +189,7 @@ const Whisp = () => {
     <>
       <CatalogBanner />
       <Box grow>
-        <Box id="header" horizontal grow marginBottom="18px">
+        <Box id="header" horizontal marginBottom="18px">
           <Box horizontal grow justifyContent="space-between">
             <Box>
               <Title>Whispers</Title>
@@ -178,6 +201,36 @@ const Whisp = () => {
                   <Box>New Account</Box>
                 </Box>
               </Button>
+            </Box>
+          </Box>
+        </Box>
+        <Box marginBottom="18px">
+          {dummyAlerts.map(alert => (
+            <Box marginBottom="12px">
+              <AlertRow key={alert.id}>
+                <Box horizontal>
+                  <LiveAppIcon icon={undefined} name={alert.name} size={35} />
+                  <Box marginLeft="18px">
+                    <CardHeader>{alert.name}</CardHeader>
+                    <CardSubtitle>{alert.condition}</CardSubtitle>
+                  </Box>
+                </Box>
+                <div>
+                  <CustomTag active type="plain" size="small">
+                    Activated
+                  </CustomTag>
+                  <Box>
+                      <IconCheck color={colors.positiveGreen} size={16} />
+                  </Box>
+                </div>
+              </AlertRow>
+            </Box>
+          ))}
+        </Box>
+        <Box id="header" horizontal marginBottom="18px">
+          <Box horizontal grow justifyContent="space-between">
+            <Box>
+              <Title>Discover</Title>
             </Box>
           </Box>
         </Box>
@@ -194,9 +247,6 @@ const Whisp = () => {
             </AlertCard>
           ))}
         </AlertsGrid>
-        <Box>
-          <NotificationPanel></NotificationPanel>
-        </Box>
       </Box>
     </>
   );

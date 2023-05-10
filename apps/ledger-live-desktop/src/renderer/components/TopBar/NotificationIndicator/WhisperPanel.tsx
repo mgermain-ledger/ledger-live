@@ -157,7 +157,6 @@ function ArticleLink({ label, href, utmCampaign, color }: ArticleLinkProps) {
   const { handler } = useDeepLinkHandler();
   const dispatch = useDispatch();
   // const url = useMemo(() => {
-  //   const url = new URL(href);
   //   url.searchParams.set("utm_medium", "announcement");
   //   if (utmCampaign) {
   //     url.searchParams.set("utm_campaign", utmCampaign);
@@ -166,11 +165,13 @@ function ArticleLink({ label, href, utmCampaign, color }: ArticleLinkProps) {
   // }, [href, utmCampaign]);
   const onLinkClick = useCallback(() => {
     console.log("Clicked");
-    // const isDeepLink = url.protocol === "ledgerlive:";
-    // if (isDeepLink) {
-    //   handler(null, url.href);
-    //   dispatch(closeInformationCenter());
-    // } else openURL(url.href);
+    // if( href !== null ) {
+    //   const url = new URL(href);
+    //   if ( url.includes("ledgerlive:")) {
+    //     handler(null, url.href);
+    //     dispatch(closeInformationCenter());
+    //   } else openURL(url.href);
+    // }
   }, [handler, dispatch]);
   return (
     // <LinkWithExternalIcon
