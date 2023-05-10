@@ -10,6 +10,7 @@ import {
 import { notificationsContentCardSelector } from "~/renderer/reducers/dynamicContent";
 import { setNotificationsCards } from "~/renderer/actions/dynamicContent";
 import { track } from "../analytics/segment";
+import { log } from "xstate/lib/actions";
 
 export function useNotifications() {
   const [cachedNotifications, setCachedNotifications] = useState<braze.Card[]>([]);
@@ -17,6 +18,8 @@ export function useNotifications() {
   const notificationsCards = useSelector(notificationsContentCardSelector);
   
   useEffect(() => {
+    console.log("rawNotification", braze
+    .getCachedContentCards())
     const cards = braze
       .getCachedContentCards()
       .cards.filter(
@@ -89,7 +92,7 @@ export function useNotifications() {
       const currentCard = cachedNotifications.find(c => c.id === card.id);
 
       // Add here the fact that we need to trigger the CTA to sign the transaction
-      
+
       if (currentCard) {
         braze.logContentCardClick(currentCard);
       }

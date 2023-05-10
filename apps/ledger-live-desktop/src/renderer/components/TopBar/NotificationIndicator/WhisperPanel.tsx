@@ -21,14 +21,13 @@ import { urls } from "~/config/urls";
 import Button from "~/renderer/components/Button";
 import { LocationContentCard, NotificationContentCard } from "~/types/dynamicContent";
 import { flattenAccountsSelector } from "~/renderer/reducers/accounts";
+import { openModal } from "~/renderer/actions/modals";
 // Martin's loco test
-// import {
-//   Transaction,
-//   TransactionSign,
-//   WalletAPIClient,
-//   WindowMessageTransport,
-// } from "@ledgerhq/wallet-api-client";
-// import HWTransport from "@ledgerhq/hw-transport";
+import { Params } from '~/renderer/modals/SignTransaction/Body'; // import Params type from your types file
+import { SignedOperation } from "@ledgerhq/types-live/lib/transaction";
+import BigNumber from "bignumber.js";
+import { PlatformTransaction } from "@ledgerhq/live-common/platform/types";
+
 
 const DateRowContainer = styled.div`
   padding: 4px 16px;
@@ -300,30 +299,128 @@ const notificationCardsDummy: NotificationContentCard[] = [
 
 export function WhisperPanel() {
   const { logNotificationImpression, groupNotifications, onClickNotif } = useNotifications();
-
-   // Define the Ledger Live API variable used to call api methods
-  //  const api = useRef<WalletAPIClient>();
-  //  const transport = useRef<HWTransport>();
- 
-   const [output, setOutput] = useState<any>(null);
- 
-   // Instantiate the Ledger Live API on component mount
-  //  useEffect(() => {
-  //    const windowTransport = new WindowMessageTransport();
-  //    const client = new WalletAPIClient(windowTransport);
-  //    windowTransport.connect();
-  //    api.current = client;
- 
-  //    // Cleanup the Ledger Live API on component unmount
-  //    return () => {
-  //      api.current = undefined;
-  //      windowTransport.disconnect();
-  //    };
-  //  }, []);
-
-  //Modals 
+  //Modals
   const accounts = useSelector(flattenAccountsSelector);
   const dispatch = useDispatch();
+
+  // function signTransaction(params, canEditFees, hasFeesProvided, liveTx, account, parentAccount, manifest, tracking, dispatch) {
+  //   return new Promise((resolve, reject) =>
+  //     dispatch(
+  //       openModal("MODAL_SIGN_TRANSACTION", {
+  //         canEditFees,
+  //         stepId: canEditFees && !hasFeesProvided ? "amount" : "summary",
+  //         transactionData: liveTx,
+  //         useApp: params?.useApp,
+  //         account,
+  //         parentAccount,
+  //         onResult: (signedOperation) => {
+  //           tracking.platformSignTransactionSuccess(manifest);
+  //           resolve(serializePlatformSignedTransaction(signedOperation));
+  //         },
+  //         onCancel: (error) => {
+  //           tracking.platformSignTransactionFail(manifest);
+  //           reject(error);
+  //         },
+  //       })
+  //     )
+  //   );
+  // }
+
+  function signTransaction({
+    canEditFees,
+    useApp,
+    account,
+    transactionData,
+    onResult,
+    onCancel,
+    parentAccount,
+    startWithWarning,
+    recipient,
+    amount
+  }: Params): Promise<void> {
+    return new Promise((resolve, reject) =>
+      dispatch(
+        openModal("MODAL_SIGN_TRANSACTION", {
+          canEditFees,
+          stepId: canEditFees ? "amount" : "summary",
+          transactionData: {
+            ...transactionData,
+            recipient,
+            amount
+          },
+          useApp,
+          account,
+          parentAccount,
+          onResult: (signedOperation: SignedOperation) => {
+            onResult(signedOperation);
+            resolve();
+          },
+          onCancel: (error: Error) => {
+            // onCancel(error);
+            reject(error);
+          },
+          startWithWarning
+        })
+      )
+    );
+  }
+  
+  console.log(accounts);
+
+  // const baseMockTransaction: Transaction = {
+  //   amount: new BigNumber(0),
+  //   recipient: "",
+  //   useAllAmount: false,
+  //   mode: "send",
+  //   family: "ethereum",
+  //   gasPrice: null,
+  //   maxFeePerGas: new BigNumber("28026227316"),
+  //   maxPriorityFeePerGas: new BigNumber("1000000000"),
+  //   userGasLimit: null,
+  //   estimatedGasLimit: null,
+  //   feeCustomUnit: null,
+  //   networkInfo: {
+  //     family: "ethereum",
+  //   },
+
+  // const myTransactionData: PlatformTransaction & { gasLimit: BigNumber } = {
+  //   family: "ethereum",
+  //   amount: new BigNumber("100000000000000000"), // 1 ETH in wei
+  //   recipient: "0xEb01D9cD600De20100753459B619A3e0cd86456e".toLowerCase(),
+  //   gasPrice: new BigNumber("50000000000"), // 50 gwei
+  //   gasLimit: new BigNumber("21000")
+  // };
+
+  function createRawEtherumTransaction(): RawPlatformTransaction {
+    return {
+      family: "ethereum" as any,
+      amount: "0",
+      recipient: "0x524cab2ec69124574082676e6f654a18df49a048",
+      nonce: 8,
+      data: "a0712d680000000000000000000000000000000000000000000000000000000000000001",
+      gasPrice: new BigNumber("21000"),
+      gasLimit: new BigNumber("21000")
+    };
+  }
+
+  const MyTxParams: Params = {
+    canEditFees: true,
+    useApp: undefined,
+    account: accounts[3],
+    transactionData: {
+      ... createRawEtherumTransaction(),
+    },
+    onResult: (signedOperation: SignedOperation) => {
+      // Handle success
+    },
+    onCancel: (reason: unknown) => {
+      // Handle error
+    },
+    parentAccount: null,
+    startWithWarning: false,
+    recipient: "0x524cab2ec69124574082676e6f654a18df49a048",
+    amount: new BigNumber(1000)
+  };  
 
   const timeoutByUUID = useRef<Record<string, NodeJS.Timeout>>({});
   const handleInViewNotif = useCallback(
@@ -354,7 +451,7 @@ export function WhisperPanel() {
     [notificationCardsDummy],
   );
 
-  if (!notificationCardsDummy) {
+  if (true) {
     return (
       <PanelContainer>
         <Text
@@ -387,7 +484,7 @@ export function WhisperPanel() {
         >
           <Button
             primary
-            onClick={undefined}
+            onClick={() => signTransaction(MyTxParams)}
             data-test-id="portfolio-empty-state-add-account-button"
           >
             Add Whisper
