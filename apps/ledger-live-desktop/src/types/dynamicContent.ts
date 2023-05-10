@@ -3,6 +3,7 @@ import { ClassicCard } from "@braze/web-sdk";
 export enum LocationContentCard {
   Portfolio = "portfolio",
   NotificationCenter = "notification_center",
+  Whisper = "whisper"
 }
 
 export enum Platform {
@@ -31,6 +32,12 @@ export type ContentCard = {
 
 export type PortfolioContentCard = ContentCard;
 export type NotificationContentCard = ContentCard & {
+  createdAt: Date;
+  cta: string;
+  viewed: boolean;
+};
+
+export type WhisperContentCard = ContentCard & {
   createdAt: Date;
   cta: string;
   viewed: boolean;

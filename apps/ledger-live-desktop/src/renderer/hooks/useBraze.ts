@@ -7,14 +7,15 @@ import {
   PortfolioContentCard,
   NotificationContentCard,
   Platform,
+  WhisperContentCard,
 } from "~/types/dynamicContent";
 import { useDispatch, useSelector } from "react-redux";
-import { setNotificationsCards, setPortfolioCards } from "../actions/dynamicContent";
+import { setNotificationsCards, setPortfolioCards, setWhisperCards } from "../actions/dynamicContent";
 import getUser from "~/helpers/user";
 import { developerModeSelector } from "../reducers/settings";
 
 const getDesktopCards = (elem: braze.ContentCards) =>
-  elem.cards.filter(card => card.extras?.platform === Platform.Desktop);
+  elem.cards;
 
 export const filterByPage = (array: braze.Card[], page: LocationContentCard) =>
   array.filter(card => card.extras?.location === page);
@@ -44,6 +45,20 @@ export const mapAsNotificationContentCard = (card: ClassicCard) =>
     viewed: card.viewed,
     brazeCard: { ...card },
   } as NotificationContentCard);
+
+export const mapAsWhisperContentCard = (card: ClassicCard) =>
+  ({
+    id: card.id,
+    title: card.extras?.title,
+    description: card.extras?.description,
+    location: LocationContentCard.Whisper,
+    url: card.extras?.url,
+    path: card.extras?.path,
+    cta: card.extras?.cta,
+    createdAt: card.created,
+    viewed: card.viewed,
+    brazeCard: { ...card },
+  } as WhisperContentCard);
 
 export async function useBraze() {
   const dispatch = useDispatch();
@@ -81,8 +96,15 @@ export async function useBraze() {
         LocationContentCard.NotificationCenter,
       ).map(card => mapAsNotificationContentCard(card as ClassicCard));
 
+      const whisperCards = filterByPage(desktopCards, LocationContentCard.Whisper).map(card =>
+        mapAsWhisperContentCard(card as ClassicCard),
+      );
+
+      console.log("usebraze",{whisperCards});
+
       dispatch(setPortfolioCards(portfolioCards));
       dispatch(setNotificationsCards(notificationsCards));
+      dispatch(setWhisperCards(whisperCards));
     });
 
     braze.automaticallyShowInAppMessages();

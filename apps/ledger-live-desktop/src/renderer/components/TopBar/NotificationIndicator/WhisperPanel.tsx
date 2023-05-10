@@ -23,11 +23,12 @@ import { LocationContentCard, NotificationContentCard } from "~/types/dynamicCon
 import { flattenAccountsSelector } from "~/renderer/reducers/accounts";
 import { openModal } from "~/renderer/actions/modals";
 // Martin's loco test
-import { Params } from '~/renderer/modals/SignTransaction/Body'; // import Params type from your types file
+import { Params } from "~/renderer/modals/SignTransaction/Body"; // import Params type from your types file
 import { SignedOperation } from "@ledgerhq/types-live/lib/transaction";
 import BigNumber from "bignumber.js";
 import { PlatformTransaction } from "@ledgerhq/live-common/platform/types";
-
+import { RawPlatformTransaction } from "@ledgerhq/live-common/platform/rawTypes";
+import { useWhispers } from "~/renderer/hooks/useWhispers";
 
 const DateRowContainer = styled.div`
   padding: 4px 16px;
@@ -155,21 +156,22 @@ type ArticleLinkProps = {
 function ArticleLink({ label, href, utmCampaign, color }: ArticleLinkProps) {
   const { handler } = useDeepLinkHandler();
   const dispatch = useDispatch();
-  const url = useMemo(() => {
-    const url = new URL(href);
-    url.searchParams.set("utm_medium", "announcement");
-    if (utmCampaign) {
-      url.searchParams.set("utm_campaign", utmCampaign);
-    }
-    return url;
-  }, [href, utmCampaign]);
+  // const url = useMemo(() => {
+  //   const url = new URL(href);
+  //   url.searchParams.set("utm_medium", "announcement");
+  //   if (utmCampaign) {
+  //     url.searchParams.set("utm_campaign", utmCampaign);
+  //   }
+  //   return url;
+  // }, [href, utmCampaign]);
   const onLinkClick = useCallback(() => {
-    const isDeepLink = url.protocol === "ledgerlive:";
-    if (isDeepLink) {
-      handler(null, url.href);
-      dispatch(closeInformationCenter());
-    } else openURL(url.href);
-  }, [url, handler, dispatch]);
+    console.log("Clicked");
+    // const isDeepLink = url.protocol === "ledgerlive:";
+    // if (isDeepLink) {
+    //   handler(null, url.href);
+    //   dispatch(closeInformationCenter());
+    // } else openURL(url.href);
+  }, [handler, dispatch]);
   return (
     // <LinkWithExternalIcon
     //   color={color}
@@ -298,33 +300,17 @@ const notificationCardsDummy: NotificationContentCard[] = [
 ];
 
 export function WhisperPanel() {
-  const { logNotificationImpression, groupNotifications, onClickNotif } = useNotifications();
+  const { cachedWhispers, whisperCards, logWhisperImpression, groupWhispers, onClickWhisper } = useWhispers();
+  // const { logNotificationImpression, groupNotifications, onClickNotif } = useNotifications();
   //Modals
   const accounts = useSelector(flattenAccountsSelector);
   const dispatch = useDispatch();
 
-  // function signTransaction(params, canEditFees, hasFeesProvided, liveTx, account, parentAccount, manifest, tracking, dispatch) {
-  //   return new Promise((resolve, reject) =>
-  //     dispatch(
-  //       openModal("MODAL_SIGN_TRANSACTION", {
-  //         canEditFees,
-  //         stepId: canEditFees && !hasFeesProvided ? "amount" : "summary",
-  //         transactionData: liveTx,
-  //         useApp: params?.useApp,
-  //         account,
-  //         parentAccount,
-  //         onResult: (signedOperation) => {
-  //           tracking.platformSignTransactionSuccess(manifest);
-  //           resolve(serializePlatformSignedTransaction(signedOperation));
-  //         },
-  //         onCancel: (error) => {
-  //           tracking.platformSignTransactionFail(manifest);
-  //           reject(error);
-  //         },
-  //       })
-  //     )
-  //   );
-  // }
+  const groups = useMemo(
+    () => groupWhispers(whisperCards),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [whisperCards],
+  );
 
   function signTransaction({
     canEditFees,
@@ -336,7 +322,7 @@ export function WhisperPanel() {
     parentAccount,
     startWithWarning,
     recipient,
-    amount
+    amount,
   }: Params): Promise<void> {
     return new Promise((resolve, reject) =>
       dispatch(
@@ -346,7 +332,7 @@ export function WhisperPanel() {
           transactionData: {
             ...transactionData,
             recipient,
-            amount
+            amount,
           },
           useApp,
           account,
@@ -359,13 +345,11 @@ export function WhisperPanel() {
             // onCancel(error);
             reject(error);
           },
-          startWithWarning
-        })
-      )
+          startWithWarning,
+        }),
+      ),
     );
   }
-  
-  console.log(accounts);
 
   // const baseMockTransaction: Transaction = {
   //   amount: new BigNumber(0),
@@ -395,20 +379,20 @@ export function WhisperPanel() {
     return {
       family: "ethereum" as any,
       amount: "0",
-      recipient: "0x524cab2ec69124574082676e6f654a18df49a048",
+      recipient: "0x932Ca55B9Ef0b3094E8Fa82435b3b4c50d713043",
       nonce: 8,
-      data: "a0712d680000000000000000000000000000000000000000000000000000000000000001",
+      data: "0x6ecd23060000000000000000000000000000000000000000000000000000000000000001",
       gasPrice: new BigNumber("21000"),
-      gasLimit: new BigNumber("21000")
+      gasLimit: new BigNumber("21000"),
     };
   }
 
   const MyTxParams: Params = {
     canEditFees: true,
     useApp: undefined,
-    account: accounts[3],
+    account: accounts[12],
     transactionData: {
-      ... createRawEtherumTransaction(),
+      ...createRawEtherumTransaction(),
     },
     onResult: (signedOperation: SignedOperation) => {
       // Handle success
@@ -418,22 +402,18 @@ export function WhisperPanel() {
     },
     parentAccount: null,
     startWithWarning: false,
-    recipient: "0x524cab2ec69124574082676e6f654a18df49a048",
-    amount: new BigNumber(1000)
-  };  
+    recipient: "0x932Ca55B9Ef0b3094E8Fa82435b3b4c50d713043",
+    amount: new BigNumber(1000),
+  };
 
   const timeoutByUUID = useRef<Record<string, NodeJS.Timeout>>({});
   const handleInViewNotif = useCallback(
     (visible: boolean, uuid: keyof typeof timeoutByUUID.current) => {
       const timeouts = timeoutByUUID.current;
-
-      if (
-        notificationCardsDummy.find(n => !n.viewed && n.id === uuid) &&
-        visible &&
-        !timeouts[uuid]
-      ) {
+      console.log("handleInViewNotif");
+      if (whisperCards.find(n => !n.viewed && n.id === uuid) && visible && !timeouts[uuid]) {
         timeouts[uuid] = setTimeout(() => {
-          logNotificationImpression(uuid);
+          logWhisperImpression(uuid);
           delete timeouts[uuid];
         }, 2000);
       }
@@ -442,16 +422,10 @@ export function WhisperPanel() {
         delete timeouts[uuid];
       }
     },
-    [logNotificationImpression, notificationCardsDummy],
+    [logWhisperImpression, whisperCards],
   );
 
-  const groups = useMemo(
-    () => groupNotifications(notificationCardsDummy),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [notificationCardsDummy],
-  );
-
-  if (true) {
+  if (whisperCards.length === 0) {
     return (
       <PanelContainer>
         <Text
@@ -504,7 +478,7 @@ export function WhisperPanel() {
                 <InView
                   as="div"
                   onChange={visible => handleInViewNotif(visible, id)}
-                  onClick={() => onClickNotif(group.data[index])}
+                  onClick={() => onClickWhisper(group.data[index])}
                 >
                   <Article
                     title={title}

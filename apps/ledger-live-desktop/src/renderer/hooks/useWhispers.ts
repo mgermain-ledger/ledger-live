@@ -3,29 +3,28 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   LocationContentCard,
-  NotificationContentCard,
   Platform,
   ContentCard,
+  WhisperContentCard,
 } from "~/types/dynamicContent";
-import { notificationsContentCardSelector } from "~/renderer/reducers/dynamicContent";
-import { setNotificationsCards } from "~/renderer/actions/dynamicContent";
+import { whisperContentCardSelector } from "~/renderer/reducers/dynamicContent";
+import { setWhisperCards } from "~/renderer/actions/dynamicContent";
 import { track } from "../analytics/segment";
-import { log } from "xstate/lib/actions";
 
-export function useNotifications() {
-  const [cachedNotifications, setCachedNotifications] = useState<braze.Card[]>([]);
+export function useWhispers() {
+  const [cachedWhispers, setCachedWhispers] = useState<braze.Card[]>([]);
   const dispatch = useDispatch();
-  const notificationsCards = useSelector(notificationsContentCardSelector);
+  const whisperCards = useSelector(whisperContentCardSelector);
   
   useEffect(() => {
+    console.log("rawCC", braze.getCachedContentCards().cards)
     const cards = braze
       .getCachedContentCards()
       .cards.filter(
         card =>
-          card.extras?.platform === Platform.Desktop &&
-          card.extras?.location === LocationContentCard.NotificationCenter,
+          card.extras?.location === LocationContentCard.Whisper,
       );
-    setCachedNotifications(cards);
+      setCachedWhispers(cards);
   }, []);
 
   function startOfDayTime(date: Date): number {
@@ -33,25 +32,25 @@ export function useNotifications() {
     return startOfDate.getTime();
   }
 
-  const groupNotifications = (
-    notifs: NotificationContentCard[],
+  const groupWhispers = (
+    whispers: WhisperContentCard[],
   ): {
     day: Date | null | undefined;
-    data: NotificationContentCard[];
+    data: WhisperContentCard[];
   }[] => {
-    const notifsByDay: Record<string, NotificationContentCard[]> = notifs.reduce(
-      (sum: Record<string, NotificationContentCard[]>, notif: NotificationContentCard) => {
+    const whispersByDay: Record<string, WhisperContentCard[]> = whispers.reduce(
+      (sum: Record<string, WhisperContentCard[]>, whisper: WhisperContentCard) => {
         // group by publication date
-        const k = startOfDayTime(notif.createdAt);
+        const k = startOfDayTime(whisper.createdAt);
 
-        return { ...sum, [`${k}`]: [...(sum[k] || []), notif] };
+        return { ...sum, [`${k}`]: [...(sum[k] || []), whisper] };
       },
       {},
     );
     // map over the keyed groups and sort them by date
-    return Object.keys(notifsByDay)
+    return Object.keys(whispersByDay)
       .filter(
-        key => notifsByDay[key] && notifsByDay[key].length > 0, // filter out potential empty groups
+        key => whispersByDay[key] && whispersByDay[key].length > 0, // filter out potential empty groups
       )
       .map(key => Number(key)) // map every string to a number for sort evaluation
       .sort((a, b) => {
@@ -62,17 +61,17 @@ export function useNotifications() {
       .map(date => ({
         day: date === 0 ? null : new Date(date),
         // format Day if available
-        data: notifsByDay[`${date}`],
+        data: whispersByDay[`${date}`],
       }));
   };
 
-  const logNotificationImpression = useCallback(
+  const logWhisperImpression = useCallback(
     (cardId: string) => {
-      const currentCard = cachedNotifications.find(card => card.id === cardId);
+      const currentCard = cachedWhispers.find(card => card.id === cardId);
 
       braze.logContentCardImpressions(currentCard ? [currentCard] : []);
 
-      const cards = (notificationsCards ?? []).map(n => {
+      const cards = (whisperCards ?? []).map(n => {
         if (n.id === cardId) {
           return { ...n, viewed: true };
         } else {
@@ -80,16 +79,17 @@ export function useNotifications() {
         }
       });
 
-      dispatch(setNotificationsCards(cards));
+      dispatch(setWhisperCards(cards));
     },
-    [notificationsCards, cachedNotifications, dispatch],
+    [whisperCards, cachedWhispers, dispatch],
   );
 
-  const onClickNotif = useCallback(
+  const onClickWhisper = useCallback(
     (card: ContentCard) => {
-      const currentCard = cachedNotifications.find(c => c.id === card.id);
+      const currentCard = cachedWhispers.find(c => c.id === card.id);
 
       // Add here the fact that we need to trigger the CTA to sign the transaction
+      // console.log(card.id, "i'm clicked");
 
       if (currentCard) {
         braze.logContentCardClick(currentCard);
@@ -102,16 +102,16 @@ export function useNotifications() {
         page: "notification_center",
       });
     },
-    [cachedNotifications],
+    [cachedWhispers],
   );
 
   return {
-    groupNotifications,
+    groupWhispers,
     startOfDayTime,
     braze,
-    cachedNotifications,
-    notificationsCards,
-    logNotificationImpression,
-    onClickNotif,
+    cachedWhispers,
+    whisperCards,
+    logWhisperImpression,
+    onClickWhisper,
   };
 }
