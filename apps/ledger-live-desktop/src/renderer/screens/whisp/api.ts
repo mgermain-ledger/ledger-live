@@ -8,8 +8,8 @@ export const setupAccount = async (accountId = "0x22F9DF1a8f82682E05b53A739dc61e
     const response = await network({
       method: "GET",
       headers: {
-        Origin: "http://localhost:8080",
-        Host: "http://ns3179261.ip-51-210-220.eu",
+        // Origin: "http://localhost:8080",
+        // Host: "http://ns3179261.ip-51-210-220.eu",
         Accept: "*/*",
         "Access-Control-Allow-Origin": "*",
         "Content-Type": "application/json",
@@ -21,8 +21,8 @@ export const setupAccount = async (accountId = "0x22F9DF1a8f82682E05b53A739dc61e
       const putResponse = await network({
         method: "PUT",
         headers: {
-          Origin: "http://localhost:8080",
-          Host: "http://ns3179261.ip-51-210-220.eu",
+          // Origin: "http://localhost:8080",
+          // Host: "http://ns3179261.ip-51-210-220.eu",
           Accept: "*/*",
           "Access-Control-Allow-Origin": "*",
           "Content-Type": "application/json",
@@ -54,8 +54,8 @@ export const getMonitors = async (
   const monitorsResponse = await network({
     method: "GET",
     headers: {
-      Origin: "http://localhost:8080",
-      Host: "http://ns3179261.ip-51-210-220.eu",
+      // Origin: "http://localhost:8080",
+      // Host: "http://ns3179261.ip-51-210-220.eu",
       Accept: "*/*",
       "Access-Control-Allow-Origin": "*",
       "Content-Type": "application/json",
