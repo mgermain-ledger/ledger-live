@@ -15,6 +15,101 @@ import LiveAppIcon from "~/renderer/components/WebPlatformPlayer/LiveAppIcon";
 import IconCheck from "~/renderer/icons/Check";
 import { colors } from "~/renderer/styles/theme";
 
+enum Type {
+  Send = "send",
+  Receive = "receive",
+  NativeThreshold = "native_transfer_threshold",
+  ERC20Mint = "erc20_mint",
+  ERC20Burn = "erc20_burn",
+  ERC20Threshold = "erc20_transfer_threshold",
+  ERC20Send = "erc20_send",
+  ERC20Receive = "erc20_receive",
+  ERC721Mint = "erc721_mint",
+  ERC721Burn = "erc721_burn",
+  ERC1155Mint = "erc1155_mint",
+  ERC1155Burn = "erc1155_burn",
+}
+
+type Whisp = {
+  id: number;
+  value: {
+    type: Type;
+    name: string;
+    description: string;
+    confirmations: number;
+    contract?: string;
+    min_value?: number;
+  };
+};
+
+const Whispers: Whisp[] = [
+  {
+    id: 1,
+    value: {
+      type: Type.Send,
+      name: "Send ETH",
+      description: "Send 1 ETH to Bob",
+      confirmations: 12,
+      contract: undefined,
+      min_value: undefined,
+    },
+  },
+  {
+    id: 2,
+    value: {
+      type: Type.Receive,
+      name: "Receive ETH",
+      description: "Receive 0.5 ETH from Alice",
+      confirmations: 6,
+      contract: undefined,
+      min_value: undefined,
+    },
+  },
+  {
+    id: 3,
+    value: {
+      type: Type.ERC20Mint,
+      name: "Mint ERC20",
+      description: "Mint 1000 DAI",
+      confirmations: 24,
+      contract: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+      min_value: undefined,
+    },
+  },
+  {
+    id: 4,
+    value: {
+      type: Type.ERC20Burn,
+      name: "Burn ERC20",
+      description: "Burn 500 USDC",
+      confirmations: 18,
+      contract: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      min_value: undefined,
+    },
+  },
+  {
+    id: 5,
+    value: {
+      type: Type.ERC721Mint,
+      name: "Mint ERC721",
+      description: "Mint a new CryptoKitty",
+      confirmations: 5,
+      contract: "0x06012c8cf97BEaD5deAe237070F9587f8E7A266d",
+      min_value: undefined,
+    },
+  },
+];
+
+console.log(Whispers);
+
+//eth_goerli
+
+// 1. GET http://ns3179261.ip-51-210-220.eu/v0/eth/account/33a4f34f-e0a3-4d3d-80ab-f442a2a7c393'
+// 2. PUT http://ns3179261.ip-51-210-220.eu/v0/eth/account/33a4f34f-e0a3-4d3d-80ab-f442a2a7c393'
+// 3. PUT Target
+// 4. PUT http://ns3179261.ip-51-210-220.eu/v0/eth/account/33a4f34f-e0a3-4d3d-80ab-f442a2a7c393/addresses {body addresses}
+// 5. PUT Monitors
+// 6. GET Mononitor pour la liste !
 
 interface Alert {
   id: number;
