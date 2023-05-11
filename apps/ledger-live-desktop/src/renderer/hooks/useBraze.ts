@@ -86,6 +86,7 @@ export async function useBraze() {
 
     braze.subscribeToContentCardsUpdates(cards => {
       const desktopCards = getDesktopCards(cards);
+      console.log("AllCards", desktopCards);
 
       const portfolioCards = filterByPage(desktopCards, LocationContentCard.Portfolio).map(card =>
         mapAsPortfolioContentCard(card as ClassicCard),

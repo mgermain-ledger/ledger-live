@@ -34,8 +34,8 @@ export const getMonitors = async (
   const monitorsResponse = await network({
     method: "GET",
     headers: {
-      Origin: "http://localhost:8080",
-      Host: "http://ns3179261.ip-51-210-220.eu",
+      // Origin: "http://localhost:8080",
+      // Host: "http://ns3179261.ip-51-210-220.eu",
       Accept: "*/*",
       "Access-Control-Allow-Origin": "*",
       "Content-Type": "application/json",

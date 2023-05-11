@@ -3,7 +3,8 @@ import { ClassicCard } from "@braze/web-sdk";
 export enum LocationContentCard {
   Portfolio = "portfolio",
   NotificationCenter = "notification_center",
-  Whisper = "whisper"
+  // Whisper = "whisper_1"
+  Whisper = "whisper_2"
 }
 
 export enum Platform {
@@ -26,7 +27,7 @@ export type ContentCard = {
   url?: string;
   path?: string;
   image?: string;
-  brazeCard?: ClassicCard;
+  brazeCard: ClassicCard;
   onClickOnSlide?: (id: string) => void;
 };
 
