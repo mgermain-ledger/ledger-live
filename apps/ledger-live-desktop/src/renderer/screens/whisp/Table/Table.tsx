@@ -24,7 +24,7 @@ const Table = <T extends object>({ data, columns, isRowsClickable }: ReactTableP
           <tr key={headerGroup.id}>
             {headerGroup.headers.map(header => (
               <td key={header.id}>
-                <S.HeaderText variant="small" fontWeight="medium" color="neutral.c70">
+                <S.HeaderText variant="small" fontWeight="medium" color="neutral.c10">
                   {header.isPlaceholder
                     ? null
                     : flexRender(header.column.columnDef.header, header.getContext())}

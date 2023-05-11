@@ -10,9 +10,10 @@ import styled from "styled-components";
 import CatalogBanner from "../platform/CatalogBanner";
 import { WhispersTable } from "./Table";
 import LiveAppIcon from "~/renderer/components/WebPlatformPlayer/LiveAppIcon";
-import IconCheck from "~/renderer/icons/Check";
 import { colors } from "~/renderer/styles/theme";
+
 import { setupAccount } from "./api";
+import AppCard from "./WhispCards/AppCard";
 
 enum Type {
   Send = "send",
@@ -37,6 +38,7 @@ export type Whisp = {
     description: string;
     confirmations: number;
     contract?: string;
+    // eslint-disable-next-line camelcase
     min_value?: number;
   };
 };
@@ -101,7 +103,7 @@ const mockWhispers: Whisp[] = [
 
 console.log(mockWhispers);
 
-//eth_goerli
+// eth_goerli
 
 // 1. GET http://ns3179261.ip-51-210-220.eu/v0/eth/account/33a4f34f-e0a3-4d3d-80ab-f442a2a7c393'
 // 2. PUT http://ns3179261.ip-51-210-220.eu/v0/eth/account/33a4f34f-e0a3-4d3d-80ab-f442a2a7c393'
@@ -117,44 +119,32 @@ interface Alert {
   condition: string;
 }
 
-//  temp type until i have data
-export type WhispersSubscription = {
-  id: number;
-  name: string;
-  address: string; // "address of interest" | "contract of interest"
-  condition: string;
-  ticker?: string; // e.g. "ETH" for icon
-  action?: "transfer" | "withdrawal" | "mint" | "burn" | "send" | "receive" | string;
-  threshold?: number;
-  currencyCategory?: "native" | "erc20" | "erc721" | "erc1155";
-};
-
-const dummyAlerts: WhispersSubscription[] = [
-  {
-    id: 1,
-    name: "Mint 4 NFTs",
-    address: "0x123456789",
-    condition: "mint 4 NFTs of CryptoKitties collection",
-    threshold: 4,
-    action: "mint",
-  },
-  {
-    id: 2,
-    name: "Large liquidity withdrawal",
-    address: "0x987654321",
-    condition: "withdrawal of more than 100,000 from Uniswap pool",
-    threshold: 100000,
-    action: "withdrawal",
-  },
-  {
-    id: 3,
-    name: "Price increase",
-    address: "0xabcdef0123",
-    condition: "ETH price exceeds 5000",
-    threshold: 5000,
-    action: undefined,
-  },
-];
+// const dummyAlerts = [
+//   {
+//     id: 1,
+//     name: "Mint 4 NFTs",
+//     address: "0x123456789",
+//     condition: "mint 4 NFTs of CryptoKitties collection",
+//     threshold: 4,
+//     action: "mint",
+//   },
+//   {
+//     id: 2,
+//     name: "Large liquidity withdrawal",
+//     address: "0x987654321",
+//     condition: "withdrawal of more than 100,000 from Uniswap pool",
+//     threshold: 100000,
+//     action: "withdrawal",
+//   },
+//   {
+//     id: 3,
+//     name: "Price increase",
+//     address: "0xabcdef0123",
+//     condition: "ETH price exceeds 5000",
+//     threshold: 5000,
+//     action: undefined,
+//   },
+// ];
 
 const Grid = styled.div`
   display: grid;
@@ -174,12 +164,13 @@ const GridItem = styled.div`
 
 const CardContent = styled(Box)`
   display: flex;
-  flex-direction: row;
+  flex-direction: row-wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   flex: 1;
 `;
 const CardHeaderContainer = styled(Box)`
+  gap: 10px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -226,7 +217,11 @@ const AlertsGrid = styled.div`
 `;
 
 const AlertCard = styled.div`
-  justify-content= start;
+  display: flex;
+  height: 300px;
+  // justify-content: start;
+  flex: 1;
+  flex-direction: column;
   padding: 20px;
   border-radius: 4px;
   background-color: ${p => p.theme.colors.palette.opacityDefault.c05};
@@ -291,11 +286,16 @@ const WhispScreen = () => {
   return (
     <Box>
       <CatalogBanner />
-      <Box id="header" horizontal grow mb={1}>
-        <Flex justifyContent="space-between" flexDirection={"row"} flexGrow={1}>
-          <Box>
-            <Title>Whispers</Title>
-          </Box>
+      <Box id="header" horizontal grow mb={0}>
+        <Flex
+          alignItems={"center"}
+          justifyContent="space-between"
+          flexDirection={"row"}
+          flexGrow={1}
+        >
+          {/* <Box> */}
+          <Title>Whispers</Title>
+          {/* </Box> */}
           <Box>
             <Button small primary onClick={handleOpenSendModal}>
               <Box horizontal flow={1} alignItems="center">
@@ -308,54 +308,50 @@ const WhispScreen = () => {
       </Box>
 
       <Box>
-        {/* Beth stuff */}
+        {/* Active alerts table */}
         {!!mockWhispers && <WhispersTable data={mockWhispers} />}
       </Box>
 
-      <Box marginBottom="18px">
-        {dummyAlerts.map(alert => (
-          <Box marginBottom="12px" key={alert.id}>
-            <AlertRow>
-              <Box horizontal>
-                <LiveAppIcon icon={undefined} name={alert.name} size={35} />
-                <Box marginLeft="18px">
-                  <CardHeader>{alert.name}</CardHeader>
-                  <CardSubtitle>{alert.condition}</CardSubtitle>
-                </Box>
-              </Box>
-              <div>
-                {/* <CustomTag active type="plain" size="small">
-                    Activated
-                  </CustomTag> */}
-                <Box>
-                  <IconCheck color={colors.positiveGreen} size={16} />
-                </Box>
-              </div>
-            </AlertRow>
-          </Box>
-        ))}
+      {/* Clickable new alerts */}
+      <Box horizontal marginTop="28px" marginBottom="10px">
+        <Flex
+          alignItems={"center"}
+          justifyContent="space-between"
+          flexDirection={"row"}
+          flexGrow={1}
+        >
+          <Title>Discover</Title>
+        </Flex>
       </Box>
+      <Grid>
+        {mockWhispers.map(alert => (
+          <GridItem key={alert.id}>
+            <AppCard
+              id={`platform-catalog-app-${alert.id}`}
+              manifest={alert}
+              onClick={() => console.log(alert)}
+            />
+          </GridItem>
+        ))}
+      </Grid>
 
-      <Box id="header" horizontal marginBottom="18px">
-        <Box horizontal grow justifyContent="space-between">
-          <Box>
-            <Title>Discover</Title>
-          </Box>
-        </Box>
-      </Box>
-      <AlertsGrid>
-        {dummyAlerts.map(alert => (
-          <AlertCard key={alert.id}>
-            <CardHeaderContainer>
-              <CardHeader>{alert.name}</CardHeader>
-            </CardHeaderContainer>
-            <CardContent>
-              <p>{alert.address}</p>
-              <p>{alert.condition}</p>
-            </CardContent>
-          </AlertCard>
+      {/* Prev grid */}
+      {/* <Grid>
+        {mockWhispers.map(({ id, value }) => (
+          <GridItem key={id}>
+            <AlertCard key={id}>
+              <CardHeaderContainer>
+                <LiveAppIcon icon={undefined} name={value.name} size={35} />
+                <CardHeader>{value.name}</CardHeader>
+              </CardHeaderContainer>
+              <CardContent>
+                <p>{value.contract}</p>
+                <p>{value.description}</p>
+              </CardContent>
+            </AlertCard>
+          </GridItem>
         ))}
-      </AlertsGrid>
+      </Grid> */}
 
       {/* <Box>
         <NotificationPanel></NotificationPanel>

@@ -22,10 +22,11 @@ export const TableBodyRow = styled.tr`
 `;
 
 export const TableBodyRowClickable = styled.tr`
-  background-color: ${({ theme }) => theme.colors.neutral.c20};
+  // background-color: ${({ theme }) => theme.colors.neutral.c20};
+  background-color: ${p => p.theme.colors.palette.opacityDefault.c05};
 
   td {
-    padding: 14px;
+    padding: 10px;
   }
 
   // Set border-radius on the top-left and bottom-left of the first table data on the table row
