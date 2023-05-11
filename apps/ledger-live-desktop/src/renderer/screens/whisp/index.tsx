@@ -112,13 +112,6 @@ console.log(mockWhispers);
 // 5. PUT Monitors
 // 6. GET Mononitor pour la liste !
 
-interface Alert {
-  id: number;
-  name: string;
-  address: string;
-  condition: string;
-}
-
 // const dummyAlerts = [
 //   {
 //     id: 1,
@@ -162,90 +155,14 @@ const GridItem = styled.div`
   }
 `;
 
-const CardContent = styled(Box)`
-  display: flex;
-  flex-direction: row-wrap;
-  align-items: center;
-  justify-content: space-around;
-  flex: 1;
-`;
-const CardHeaderContainer = styled(Box)`
-  gap: 10px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-`;
-const CardHeader = styled(Text)`
-  font-weight: 600;
-  font-size: 16px;
-`;
-
-const CardSubtitle = styled(Text)`
-  font-weight: 00;
-  font-size: 12px;
-`;
-
-const CustomButton = styled(Button)`
-  border: none;
-  padding-right: 14px;
-`;
-
 const Title = styled(Box).attrs(p => ({
   ff: "Inter|SemiBold",
   fontSize: 7,
   color: p.theme.colors.palette.secondary.main,
 }))``;
 
-const NotificationPanel = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: top;
-  padding: ${p => p.theme.space[3]}px;
-  gap: ${p => p.theme.space[3]}px;
-  width: 20rem;
-  height: 30rem;
-  border-radius: 4px;
-  margin-left: ${p => p.theme.space[3]}px;
-  background-color: ${p => p.theme.colors.palette.opacityDefault.c05};
-`;
-
-const AlertsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  grid-gap: 20px;
-`;
-
-const AlertCard = styled.div`
-  display: flex;
-  height: 300px;
-  // justify-content: start;
-  flex: 1;
-  flex-direction: column;
-  padding: 20px;
-  border-radius: 4px;
-  background-color: ${p => p.theme.colors.palette.opacityDefault.c05};
-`;
-
-const AlertRow = styled.div`
-  padding: 20px;
-  border-radius: 4px;
-  flex-direction: row;
-  display: flex;
-  justify-content: space-between;
-  background-color: ${p => p.theme.colors.palette.opacityDefault.c05};
-`;
-
-const CustomTag = styled(TagComponent)`
-  border-radius: 6px;
-  padding: 2px 6px 2px 6px;
-`;
-
 const WhispScreen = () => {
-  const [alerts, setAlerts] = useState<Alert[]>([]);
-  const [serverAlerts, setServerAlerts] = useState<Alert[]>([]);
-
-  // const ws = new WebSocket("ws://localhost:3000/ws");
+  const [alerts, setAlerts] = useState<Whisp[]>([mockWhispers[3], mockWhispers[0]]);
 
   const history = useHistory();
   const location = useLocation();
@@ -309,7 +226,7 @@ const WhispScreen = () => {
 
       <Box>
         {/* Active alerts table */}
-        {!!mockWhispers && <WhispersTable data={mockWhispers} />}
+        {!!alerts && <WhispersTable data={alerts} />}
       </Box>
 
       {/* Clickable new alerts */}
@@ -327,9 +244,14 @@ const WhispScreen = () => {
         {mockWhispers.map(alert => (
           <GridItem key={alert.id}>
             <AppCard
-              id={`platform-catalog-app-${alert.id}`}
+              id={`catalog-${alert.id}`}
               manifest={alert}
-              onClick={() => console.log(alert)}
+              onClick={() =>
+                setAlerts([
+                  ...alerts,
+                  mockWhispers.find(whisp => whisp.id === alert.id) ?? mockWhispers[0],
+                ])
+              }
             />
           </GridItem>
         ))}
