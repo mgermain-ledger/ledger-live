@@ -226,7 +226,12 @@ const WhispScreen = () => {
 
       <Box>
         {/* Active alerts table */}
-        {!!alerts && <WhispersTable data={alerts} />}
+        {!!alerts && (
+          <WhispersTable
+            data={alerts}
+            onDelete={id => setAlerts([...alerts.filter(alert => alert.id !== id)])}
+          />
+        )}
       </Box>
 
       {/* Clickable new alerts */}

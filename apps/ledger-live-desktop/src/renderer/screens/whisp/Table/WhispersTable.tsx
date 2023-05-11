@@ -10,7 +10,7 @@ import * as S from "./styles";
 import { Whisp } from "..";
 import LiveAppIcon from "~/renderer/components/WebPlatformPlayer/LiveAppIcon";
 
-export function WhispersTable(props: { data: Whisp[] }) {
+export function WhispersTable(props: { data: Whisp[]; onDelete?: (id: number) => void }) {
   const columns: ColumnDef<Whisp>[] = useMemo(
     () => [
       // {
@@ -75,8 +75,6 @@ export function WhispersTable(props: { data: Whisp[] }) {
         id: "active",
         header: "Active",
         cell: ctx => {
-          const { min_value: threshold, type: action } = ctx.row.original.value;
-
           return (
             <CellText>
               <IconCheck color={colors.positiveGreen} size={16} />
@@ -92,7 +90,7 @@ export function WhispersTable(props: { data: Whisp[] }) {
           return (
             <S.FlexColumn>
               <Button
-                onClick={() => console.log(`Delete subscription id: ${id}`)}
+                onClick={props?.onDelete !== undefined ? () => props.onDelete!(id) : undefined}
                 // variant="main"
                 size="small"
                 borderRadius={20}
@@ -104,7 +102,7 @@ export function WhispersTable(props: { data: Whisp[] }) {
         },
       },
     ],
-    [],
+    [props],
   );
 
   return <Table data={props.data} columns={columns} isRowsClickable />;
