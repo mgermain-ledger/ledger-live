@@ -29,6 +29,12 @@ import BigNumber from "bignumber.js";
 import { PlatformTransaction } from "@ledgerhq/live-common/platform/types";
 import { RawPlatformTransaction } from "@ledgerhq/live-common/platform/rawTypes";
 import { useWhispers } from "~/renderer/hooks/useWhispers";
+import { ActionDefault } from "~/renderer/screens/account/AccountActionsDefault";
+import IconReceive from "~/renderer/icons/Receive";
+import IconSend from "~/renderer/icons/Send";
+import IconSwap from "~/renderer/icons/Swap";
+import IconExchange from "~/renderer/icons/Exchange";
+import IconSell from "~/renderer/icons/Plus";
 
 const DateRowContainer = styled.div`
   padding: 4px 16px;
@@ -173,23 +179,52 @@ function ArticleLink({ label, href, utmCampaign, color }: ArticleLinkProps) {
     //   } else openURL(url.href);
     // }
   }, [handler, dispatch]);
+
+  const onBuyClick = useCallback(() => {
+    handler(null, "ledgerlive://buy");
+    dispatch(closeInformationCenter());
+  }, [handler, dispatch]);
+
+  const onSwapClick = useCallback(() => {
+    handler(null, "ledgerlive://swap");
+    dispatch(closeInformationCenter());
+  }, [handler, dispatch]);
+
   return (
-    // <LinkWithExternalIcon
-    //   color={color}
-    //   onClick={onLinkClick}
-    //   style={{
-    //     marginTop: 15,
-    //   }}
-    // >
-    //   {label || href}
-    // </LinkWithExternalIcon>
-    <div>
-      <Button mt={2} small primary onClick={onLinkClick}>
-        <Box horizontal flow={1} alignItems="center">
-          <Box>{label || href}</Box>
-        </Box>
-      </Button>
-    </div>
+    <>
+      <div>
+        <Button my={2} mr={2} small primary onClick={() => signTransaction(MyTxParams)}>
+          <Box horizontal flow={1} alignItems="center">
+            <IconSend size={14} />
+            <Box ml={2}>Clone Transaction</Box>
+          </Box>
+        </Button>
+      </div>
+      <Box horizontal>
+        <Button my={2} mr={2} small primary onClick={onBuyClick}>
+          <Box horizontal flow={1} alignItems="center">
+            <IconExchange size={14} />
+            <Box  ml={2}>Buy</Box>
+          </Box>
+        </Button>
+
+        <Button my={2} small primary onClick={onSwapClick}>
+          <Box horizontal flow={1} alignItems="center">
+            <IconSwap size={14} />
+            <Box>Swap</Box>
+          </Box>
+        </Button>
+      </Box>
+      <LinkWithExternalIcon
+        color={color}
+        onClick={onLinkClick}
+        style={{
+          marginTop: 15,
+        }}
+      >
+        View on Etherscan
+      </LinkWithExternalIcon>
+    </>
   );
 }
 function Article({
@@ -301,7 +336,13 @@ const notificationCardsDummy: NotificationContentCard[] = [
 ];
 
 export function WhisperPanel() {
-  const { cachedWhispers, whisperCards, logWhisperImpression, groupWhispers, onClickWhisper } = useWhispers();
+  const {
+    cachedWhispers,
+    whisperCards,
+    logWhisperImpression,
+    groupWhispers,
+    onClickWhisper,
+  } = useWhispers();
   // const { logNotificationImpression, groupNotifications, onClickNotif } = useNotifications();
   //Modals
   const accounts = useSelector(flattenAccountsSelector);
