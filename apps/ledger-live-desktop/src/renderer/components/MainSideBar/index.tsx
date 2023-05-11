@@ -24,7 +24,10 @@ import { darken, rgba } from "~/renderer/styles/helpers";
 import IconCard from "~/renderer/icons/Card";
 import IconManager from "~/renderer/icons/Manager";
 import IconWallet from "~/renderer/icons/Wallet";
+
 import IconApps from "~/renderer/icons/Apps";
+import IconEye from "~/renderer/icons/Eye";
+
 import IconReceive from "~/renderer/icons/Receive";
 import IconSend from "~/renderer/icons/Send";
 import IconExchange from "~/renderer/icons/Exchange";
@@ -428,7 +431,7 @@ const MainSideBar = () => {
                 <SideBarListItem
                   id={"whisp"}
                   label={t("Whisp")}
-                  icon={IconReceive}
+                  icon={IconEye} // customise
                   iconActiveColor="wallet"
                   onClick={handleClickWhisp}
                   collapsed={secondAnim}
