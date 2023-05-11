@@ -1,16 +1,14 @@
-import Box, { Card } from "~/renderer/components/Box";
-import React, { useState, useEffect, useCallback } from "react";
+import Box from "~/renderer/components/Box";
+import React, { useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
-import { Link, useHistory, useLocation } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import { openModal } from "~/renderer/actions/modals";
 import IconPlus from "~/renderer/icons/Plus";
 import Button from "~/renderer/components/Button";
-import { focusedShadowStyle } from "~/renderer/components/Box/Tabbable";
-import { Icons, Text, Tag as TagComponent, Toggle } from "@ledgerhq/react-ui";
+import { Flex, Text, Tag as TagComponent } from "@ledgerhq/react-ui";
 import styled from "styled-components";
 import CatalogBanner from "../platform/CatalogBanner";
-import ChevronRight from "~/renderer/icons/ChevronRight";
-import InfoCircle from "~/renderer/icons/InfoCircle";
+import { WhispersTable } from "./Table";
 import LiveAppIcon from "~/renderer/components/WebPlatformPlayer/LiveAppIcon";
 import IconCheck from "~/renderer/icons/Check";
 import { colors } from "~/renderer/styles/theme";
@@ -118,24 +116,42 @@ interface Alert {
   condition: string;
 }
 
-const dummyAlerts: Alert[] = [
+//  temp type until i have data
+export type WhispersSubscription = {
+  id: number;
+  name: string;
+  address: string; // "address of interest" | "contract of interest"
+  condition: string;
+  ticker?: string; // e.g. "ETH" for icon
+  action?: "transfer" | "withdrawal" | "mint" | "burn" | "send" | "receive" | string;
+  threshold?: number;
+  currencyCategory?: "native" | "erc20" | "erc721" | "erc1155";
+};
+
+const dummyAlerts: WhispersSubscription[] = [
   {
     id: 1,
     name: "Mint 4 NFTs",
     address: "0x123456789",
     condition: "mint 4 NFTs of CryptoKitties collection",
+    threshold: 4,
+    action: "mint",
   },
   {
     id: 2,
     name: "Large liquidity withdrawal",
     address: "0x987654321",
-    condition: "withdrawal of more than 100000 from Uniswap pool",
+    condition: "withdrawal of more than 100,000 from Uniswap pool",
+    threshold: 100000,
+    action: "withdrawal",
   },
   {
     id: 3,
     name: "Price increase",
     address: "0xabcdef0123",
     condition: "ETH price exceeds 5000",
+    threshold: 5000,
+    action: undefined,
   },
 ];
 
@@ -239,8 +255,8 @@ const Whisp = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  const openAddAccounts = useCallback(() => {
-    dispatch(openModal("MODAL_ADD_ACCOUNTS", undefined));
+  const openAddWhisper = useCallback(() => {
+    dispatch(openModal("MODAL_ADD_WHISPER", undefined));
   }, [dispatch]);
 
   //   useEffect(() => {
@@ -281,69 +297,78 @@ const Whisp = () => {
   }, [dispatch, maybeRedirectToAccounts]);
 
   return (
-    <>
+    <Box>
       <CatalogBanner />
-      <Box grow>
-        <Box id="header" horizontal marginBottom="18px">
-          <Box horizontal grow justifyContent="space-between">
-            <Box>
-              <Title>Whispers</Title>
-            </Box>
-            <Box>
-              <Button small primary onClick={handleOpenSendModal}>
-                <Box horizontal flow={1} alignItems="center">
-                  <IconPlus size={12} />
-                  <Box>New Account</Box>
-                </Box>
-              </Button>
-            </Box>
+      <Box id="header" horizontal grow mb={1}>
+        <Flex justifyContent="space-between" flexDirection={"row"} flexGrow={1}>
+          <Box>
+            <Title>Whispers</Title>
           </Box>
-        </Box>
-        <Box marginBottom="18px">
-          {dummyAlerts.map(alert => (
-            <Box marginBottom="12px">
-              <AlertRow key={alert.id}>
-                <Box horizontal>
-                  <LiveAppIcon icon={undefined} name={alert.name} size={35} />
-                  <Box marginLeft="18px">
-                    <CardHeader>{alert.name}</CardHeader>
-                    <CardSubtitle>{alert.condition}</CardSubtitle>
-                  </Box>
+          <Box>
+            <Button small primary onClick={handleOpenSendModal}>
+              <Box horizontal flow={1} alignItems="center">
+                <IconPlus size={12} />
+                <Box>Hear new whisper</Box>
+              </Box>
+            </Button>
+          </Box>
+        </Flex>
+      </Box>
+
+      <Box>
+        {/* Beth stuff */}
+        {!!dummyAlerts && <WhispersTable data={dummyAlerts} />}
+      </Box>
+
+      <Box marginBottom="18px">
+        {dummyAlerts.map(alert => (
+          <Box marginBottom="12px" key={alert.id}>
+            <AlertRow>
+              <Box horizontal>
+                <LiveAppIcon icon={undefined} name={alert.name} size={35} />
+                <Box marginLeft="18px">
+                  <CardHeader>{alert.name}</CardHeader>
+                  <CardSubtitle>{alert.condition}</CardSubtitle>
                 </Box>
-                <div>
-                  {/* <CustomTag active type="plain" size="small">
+              </Box>
+              <div>
+                {/* <CustomTag active type="plain" size="small">
                     Activated
                   </CustomTag> */}
-                  <Box>
-                    <IconCheck color={colors.positiveGreen} size={16} />
-                  </Box>
-                </div>
-              </AlertRow>
-            </Box>
-          ))}
-        </Box>
-        <Box id="header" horizontal marginBottom="18px">
-          <Box horizontal grow justifyContent="space-between">
-            <Box>
-              <Title>Discover</Title>
-            </Box>
+                <Box>
+                  <IconCheck color={colors.positiveGreen} size={16} />
+                </Box>
+              </div>
+            </AlertRow>
+          </Box>
+        ))}
+      </Box>
+
+      <Box id="header" horizontal marginBottom="18px">
+        <Box horizontal grow justifyContent="space-between">
+          <Box>
+            <Title>Discover</Title>
           </Box>
         </Box>
-        <AlertsGrid>
-          {dummyAlerts.map(alert => (
-            <AlertCard key={alert.id}>
-              <CardHeaderContainer>
-                <CardHeader>{alert.name}</CardHeader>
-              </CardHeaderContainer>
-              <CardContent>
-                <p>{alert.address}</p>
-                <p>{alert.condition}</p>
-              </CardContent>
-            </AlertCard>
-          ))}
-        </AlertsGrid>
       </Box>
-    </>
+      <AlertsGrid>
+        {dummyAlerts.map(alert => (
+          <AlertCard key={alert.id}>
+            <CardHeaderContainer>
+              <CardHeader>{alert.name}</CardHeader>
+            </CardHeaderContainer>
+            <CardContent>
+              <p>{alert.address}</p>
+              <p>{alert.condition}</p>
+            </CardContent>
+          </AlertCard>
+        ))}
+      </AlertsGrid>
+
+      {/* <Box>
+        <NotificationPanel></NotificationPanel>
+      </Box> */}
+    </Box>
   );
 };
 

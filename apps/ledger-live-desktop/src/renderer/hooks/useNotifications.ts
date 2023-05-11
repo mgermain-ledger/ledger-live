@@ -10,13 +10,12 @@ import {
 import { notificationsContentCardSelector } from "~/renderer/reducers/dynamicContent";
 import { setNotificationsCards } from "~/renderer/actions/dynamicContent";
 import { track } from "../analytics/segment";
-import { log } from "xstate/lib/actions";
 
 export function useNotifications() {
   const [cachedNotifications, setCachedNotifications] = useState<braze.Card[]>([]);
   const dispatch = useDispatch();
   const notificationsCards = useSelector(notificationsContentCardSelector);
-  
+
   useEffect(() => {
     const cards = braze
       .getCachedContentCards()
