@@ -43,8 +43,9 @@ export default function CatalogBanner() {
   return (
     <Container>
       <Content>
-        <Title>{t("platform.catalog.banner.title")}</Title>
-        <div>{t("platform.catalog.banner.description")}</div>
+        <Title>Follow the latest changes as they happen</Title>
+        <div>"5 of your favourite NFTS were burned!"</div>
+        <div>"$500BN transferred to BitCoin address you are following"</div>
       </Content>
 
       <Illustration />
