@@ -1,5 +1,5 @@
 import Box from "~/renderer/components/Box";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useHistory, useLocation } from "react-router-dom";
 import { openModal } from "~/renderer/actions/modals";
@@ -12,6 +12,7 @@ import { WhispersTable } from "./Table";
 import LiveAppIcon from "~/renderer/components/WebPlatformPlayer/LiveAppIcon";
 import IconCheck from "~/renderer/icons/Check";
 import { colors } from "~/renderer/styles/theme";
+import { setupAccount } from "./api";
 
 enum Type {
   Send = "send",
@@ -28,7 +29,7 @@ enum Type {
   ERC1155Burn = "erc1155_burn",
 }
 
-type Whisp = {
+export type Whisp = {
   id: number;
   value: {
     type: Type;
@@ -40,7 +41,7 @@ type Whisp = {
   };
 };
 
-const Whispers: Whisp[] = [
+const mockWhispers: Whisp[] = [
   {
     id: 1,
     value: {
@@ -98,7 +99,7 @@ const Whispers: Whisp[] = [
   },
 ];
 
-console.log(Whispers);
+console.log(mockWhispers);
 
 //eth_goerli
 
@@ -245,11 +246,11 @@ const CustomTag = styled(TagComponent)`
   padding: 2px 6px 2px 6px;
 `;
 
-const Whisp = () => {
+const WhispScreen = () => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [serverAlerts, setServerAlerts] = useState<Alert[]>([]);
 
-  const ws = new WebSocket("ws://localhost:3000/ws");
+  // const ws = new WebSocket("ws://localhost:3000/ws");
 
   const history = useHistory();
   const location = useLocation();
@@ -259,24 +260,15 @@ const Whisp = () => {
     dispatch(openModal("MODAL_ADD_WHISPER", undefined));
   }, [dispatch]);
 
-  //   useEffect(() => {
-  //     const ws = new WebSocket("ws://localhost:8080/ws");
-  //     ws.onopen = () => {
-  //       console.log("connected");
-  //     };
-  //     ws.onmessage = (event) => {
-  //       const data = JSON.parse(event.data);
-  //       console.log(data);
-  //       const updatedAlerts = [...serverAlerts, data];
-  //       setServerAlerts(updatedAlerts);
-  //     };
-  //     ws.onclose = () => {
-  //       console.log("disconnected");
-  //     };
-  //     return () => {
-  //       ws.close();
-  //     };
-  //   }, [serverAlerts]);
+  useEffect(() => {
+    console.log("whispy whisp");
+
+    console.log("%cWhisp.tsx line:265 whisp?", "color: white; background-color: #007acc;", {
+      alerts,
+    });
+    setupAccount();
+  }, [alerts]);
+
   const push = useCallback(
     (pathname: string) => {
       if (location.pathname === pathname) return;
@@ -317,7 +309,7 @@ const Whisp = () => {
 
       <Box>
         {/* Beth stuff */}
-        {!!dummyAlerts && <WhispersTable data={dummyAlerts} />}
+        {!!mockWhispers && <WhispersTable data={mockWhispers} />}
       </Box>
 
       <Box marginBottom="18px">
@@ -372,4 +364,4 @@ const Whisp = () => {
   );
 };
 
-export default Whisp;
+export default WhispScreen;

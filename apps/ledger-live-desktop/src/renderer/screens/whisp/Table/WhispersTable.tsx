@@ -1,28 +1,28 @@
 import React, { useMemo } from "react";
-import { Button, CryptoIcon, InvertTheme } from "@ledgerhq/react-ui";
+import { Button, CryptoIcon } from "@ledgerhq/react-ui";
 import { ColumnDef } from "@tanstack/react-table";
 
 import Table from "./Table";
 import { CellText } from "./CellText";
 import * as S from "./styles";
-import { WhispersSubscription } from "..";
+import { WhispScreen } from "..";
 
-export function WhispersTable(props: { data: WhispersSubscription[] }) {
-  const columns: ColumnDef<WhispersSubscription>[] = useMemo(
+export function WhispersTable(props: { data: Whisp[] }) {
+  const columns: ColumnDef<Whisp>[] = useMemo(
     () => [
       {
         id: "address",
         header: "Address",
         accessorKey: "address",
         cell: ctx => {
-          const { address, ticker, action } = ctx.row.original;
+          const { contract: address, type } = ctx.row.original.value;
 
           return (
             <S.FlexRow>
               {/* TODO: make sure we have the chain ticker for name */}
-              <CryptoIcon name={ticker || "BTC"} size={32} />
+              <CryptoIcon name={"ETH"} size={32} />
 
-              <CellText subTitle={action}>{address}</CellText>
+              <CellText subTitle={type}>{address || "No contract"}</CellText>
             </S.FlexRow>
           );
         },
@@ -31,7 +31,7 @@ export function WhispersTable(props: { data: WhispersSubscription[] }) {
         id: "description",
         header: "Description",
         cell: ctx => {
-          const { condition: description, name: title } = ctx.row.original;
+          const { description, name: title } = ctx.row.original.value;
 
           return <CellText subTitle={description}>{title}</CellText>;
         },
@@ -40,20 +40,11 @@ export function WhispersTable(props: { data: WhispersSubscription[] }) {
         id: "threshold",
         header: "Threshold",
         cell: ctx => {
-          const { threshold, action } = ctx.row.original;
+          const { min_value: threshold, type: action } = ctx.row.original.value;
 
           return <CellText subTitle={action}>{`Exceeds ${threshold}`}</CellText>;
         },
       },
-      // {
-      //   id: "currencyCategory",
-      //   header: "Category",
-      //   cell: ctx => {
-      //     const { currencyCategory } = ctx.row.original;
-
-      //     return <CellText>{currencyCategory}</CellText>;
-      //   },
-      // },
       {
         id: "cancelButton",
         cell: ctx => {
@@ -61,7 +52,6 @@ export function WhispersTable(props: { data: WhispersSubscription[] }) {
 
           return (
             <S.FlexColumn>
-              {/* <InvertTheme>  */}
               <Button
                 onClick={() => console.log(`Delete subscription id: ${id}`)}
                 variant="main"
@@ -69,7 +59,6 @@ export function WhispersTable(props: { data: WhispersSubscription[] }) {
               >
                 Unsubscribe
               </Button>
-              {/* </InvertTheme> */}
             </S.FlexColumn>
           );
         },
